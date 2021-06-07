@@ -1,0 +1,23 @@
+QListWidget{
+    background-color: wheat;
+}
+
+QListWidget::item{
+    height: 35px;
+    font-size: large;
+}
+QPushButton{
+    height: 30px;
+    width: 30px;
+}
+QIcon{
+    height: 30px;
+    width: 30px;
+}
+MainWindow
+{
+    border: none;
+    background-color: white;
+}
+
+
