@@ -13,6 +13,7 @@ from .api.tasks import delete_tasks
 COLORS = {False:(219, 45, 114), True:(255, 255, 255)}
 BLACK = QColor(*(0,0,0))
 WHITE = QColor(*(255,255,255))
+BLUE = (44, 140, 240)
 
 ICON_CHECKED = QIcon(ApplicationContext().get_resource("checked.png"))
 ICON_FOLDER = QIcon(ApplicationContext().get_resource("folder.png"))
@@ -103,11 +104,12 @@ class TabView(QWidget):
             self.tasks[item.name].delete()
 
 class InputText(QDialog):
-    def __init__(self, ok_text = "Créer", undo_text = "Annuler"):
+    def __init__(self,  label_text="Votre texte :", ok_text = "Créer", undo_text = "Annuler"):
         super().__init__()
         self.setWindowModality(Qt.ApplicationModal)
         self.ok_text = ok_text
         self.undo_text = undo_text
+        self.label_text = label_text
         self.setup_ui()
     
     def setup_ui(self):
@@ -123,7 +125,7 @@ class InputText(QDialog):
         self.edit = QLineEdit()
         self.btn_ok = QPushButton(self.ok_text)
         self.btn_undo = QPushButton(self.undo_text)
-        self.lbl = QLabel("Entrez le nom de la tâche")
+        self.lbl = QLabel(self.label_text)
 
     def create_layouts(self):
         self.main_layout = QVBoxLayout(self)
@@ -134,7 +136,7 @@ class InputText(QDialog):
         self.main_layout.addWidget(self.lbl)
         self.main_layout.addWidget(self.edit)
         self.main_layout.addLayout(self.button_layout)
-        self.button_layout.addStretch(1)
+        self.button_layout.addSpacing(1)
         self.button_layout.addWidget(self.btn_ok)
         self.button_layout.addWidget(self.btn_undo)
     
@@ -142,7 +144,7 @@ class InputText(QDialog):
         self.btn_ok.clicked.connect(self.accept)
         self.btn_undo.clicked.connect(self.reject)
     def modify_widgets(self):
-        self.btn_ok.setStyleSheet("background-color: blue; color:white; border-radius: 3%")
+        self.btn_ok.setStyleSheet(f"background-color: rgb{str(BLUE)}; color:white; border-radius: 3%")
         self.btn_undo.setStyleSheet("border-radius: 3%")
 
         self.btn_ok.setFlat(True)
@@ -154,26 +156,3 @@ class InputText(QDialog):
         value = self.edit.text()
         return [value, result]
 
-
-"""
-class InputText(QInputDialog):
-    def __init__(self, ok_text = "Créer", undo_text = "Annuler"):
-        super().__init__()
-        self.setInputMode(QInputDialog.TextInput)
-        self.setup_ui(ok_text, undo_text)
-    
-    def setup_ui(self, ok_text, undo_text):
-        self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setOkButtonText(ok_text)
-        self.setCancelButtonText(undo_text)
-        self.setStyleSheet("height: 60px; width: 180px; background-color: white; font-size:18px; QPushButton{background-color: blue;}")
-        self.setLabelText("Entrez le nom de la tâche")
-        self.
-
-
-    def get(self):
-        result = self.exec()
-        value = self.textValue()
-        return [value, result]
-
-""" 

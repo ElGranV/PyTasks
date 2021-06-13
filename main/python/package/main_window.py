@@ -93,7 +93,7 @@ class MainWindow(QWidget):
     
 #triggered functions
     def create_task(self):
-        name, result = InputText().get()
+        name, result = InputText("Entrez le nom de votre tâche :").get()
         if name and result:
             folder = self.tabWidget.currentWidget().folder
             self.tasks[folder][name] = Task(name, False, folder)
@@ -121,7 +121,7 @@ class MainWindow(QWidget):
             self.hide()
 
     def add_folder(self):
-        name, result = QInputDialog().getText(self, "Nouveau dossier", "Entrez le nom du nouveau dossier")
+        name, result = InputText("Entrez le nom du nouveau dossier").get()
         if name and result:
             self.tabWidget.addTab(TabView(name, {}), name)
             self.tasks[name] = {}
