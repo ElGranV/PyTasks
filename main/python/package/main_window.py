@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIcon, QKeySequence
 import os
 
 from .ui import *
-from .api.tasks import Task, delete_all_tasks, delete_tasks, dump_tasks, init_task_file, load_tasks
+from .api.tasks import Task, change_folder_name, delete_all_tasks, delete_tasks, dump_tasks, init_task_file, load_tasks
 
 class MainWindow(QWidget):
     def __init__(self, ctx):
@@ -73,11 +73,12 @@ class MainWindow(QWidget):
         self.btn_clean.clicked.connect(self.clean_done_tasks)
         self.btn_quit.clicked.connect(self.exit)
         self.btn_folder.clicked.connect(self.add_folder)
+        self.tabWidget.tabBarDoubleClicked.connect(self.folder_double_clicked)
         QShortcut(QKeySequence("+"), self.tabWidget, self.create_task)
         QShortcut(QKeySequence("Backspace"), self.tabWidget, self.delete_selected_items)
         
         self.tray.activated.connect(self.tray_icon_clicked)
-
+#icone qui s'affiche dans le systray
     def create_tray_icon(self):
         self.tray = QSystemTrayIcon()
         self.tray.setIcon(QIcon(self.ctx.get_resource("home.png")))
@@ -126,13 +127,22 @@ class MainWindow(QWidget):
             self.tabWidget.addTab(TabView(name, {}), name)
             self.tasks[name] = {}
             self.dump()
+            
+    def folder_double_clicked(self):
+        current = self.tabWidget.currentWidget()
+        new_name, result = InputText("Entrez le nouveau nom du dossier :", "Confirmer").get()
+        if new_name and result:
+            change_folder_name(current.folder, new_name)
+            current.folder = new_name
+            self.tabWidget.setTabText(self.tabWidget.indexOf(current), new_name)
+            self.load_tasks()
 
 #core functions
     def dump(self):
         tasks = {folder:{name:self.tasks[folder][name].achieved for name in self.tasks[folder]} for folder in self.tasks}
         dump_tasks(tasks)
 
-    def add_to_startup(self):#lancer au démarrage
+    def add_to_startup(self):#lancer l'application au au démarrage
         if getattr(sys, "frozen", False):
             setting = QSettings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings.NativeFormat)
             app_path = QCoreApplication.applicationFilePath()

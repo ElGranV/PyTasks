@@ -66,6 +66,12 @@ def dump_tasks(tasks):
     with open(TASKS_FILEPATH, "w") as f:
         json.dump(tasks, f)
 
+def change_folder_name(old_name, new_name):
+    tasks = simple_load_tasks()
+    if old_name in tasks and not new_name in tasks:
+        tasks[new_name] = tasks[old_name]
+        del tasks[old_name]
+        dump_tasks(tasks)
 #class
 class Task:
     def __init__(self, name, achieved=False, folder="general", loaded=False):
