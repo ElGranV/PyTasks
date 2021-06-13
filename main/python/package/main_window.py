@@ -4,7 +4,7 @@ from PyQt5.QtCore import QCoreApplication, QModelIndex, QSettings, Qt
 from PyQt5.QtGui import QIcon, QKeySequence
 import os
 
-from .ui import TabView, TaskItem, ICON_FOLDER
+from .ui import *
 from .api.tasks import Task, delete_all_tasks, delete_tasks, dump_tasks, init_task_file, load_tasks
 
 class MainWindow(QWidget):
@@ -45,7 +45,7 @@ class MainWindow(QWidget):
         
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
-        self.setWindowFlags(Qt.FramelessWindowHint)#Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
 
         self.btn_add.setIcon(QIcon(self.ctx.get_resource("plus.png")))
         self.btn_clean.setIcon(QIcon(self.ctx.get_resource("clean.png")))
@@ -93,7 +93,7 @@ class MainWindow(QWidget):
     
 #triggered functions
     def create_task(self):
-        name, result = QInputDialog().getText(self, "Nouvelle tâche", "Nom de la tâche")
+        name, result = InputText().get()
         if name and result:
             folder = self.tabWidget.currentWidget().folder
             self.tasks[folder][name] = Task(name, False, folder)

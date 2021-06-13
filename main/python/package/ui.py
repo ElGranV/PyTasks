@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QShortcut, QVBoxLayout, QHBoxLayout, QWidget, QListWidget, QListWidgetItem, QTabWidget
+from typing import overload
+from PyQt5.QtWidgets import QDialog, QInputDialog, QLabel, QLineEdit, QPushButton, QShortcut, QStyle, QVBoxLayout, QHBoxLayout, QWidget, QListWidget, QListWidgetItem, QTabWidget
 from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QColor, QIcon, QKeySequence
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
@@ -100,4 +101,79 @@ class TabView(QWidget):
         items = self.lw_tasks.selectedItems()
         for item in items:
             self.tasks[item.name].delete()
+
+class InputText(QDialog):
+    def __init__(self, ok_text = "Créer", undo_text = "Annuler"):
+        super().__init__()
+        self.setWindowModality(Qt.ApplicationModal)
+        self.ok_text = ok_text
+        self.undo_text = undo_text
+        self.setup_ui()
+    
+    def setup_ui(self):
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.create_widgets()
+        self.create_layouts()
+        self.add_widgets_to_layouts()
+        self.setup_connections()
+        self.modify_widgets()
+        self.setStyleSheet("height: 60px; width: 180px; background-color: white; font-size:18px")
         
+    def create_widgets(self):
+        self.edit = QLineEdit()
+        self.btn_ok = QPushButton(self.ok_text)
+        self.btn_undo = QPushButton(self.undo_text)
+        self.lbl = QLabel("Entrez le nom de la tâche")
+
+    def create_layouts(self):
+        self.main_layout = QVBoxLayout(self)
+        self.button_layout = QHBoxLayout()
+        
+        
+    def add_widgets_to_layouts(self):
+        self.main_layout.addWidget(self.lbl)
+        self.main_layout.addWidget(self.edit)
+        self.main_layout.addLayout(self.button_layout)
+        self.button_layout.addStretch(1)
+        self.button_layout.addWidget(self.btn_ok)
+        self.button_layout.addWidget(self.btn_undo)
+    
+    def setup_connections(self):
+        self.btn_ok.clicked.connect(self.accept)
+        self.btn_undo.clicked.connect(self.reject)
+    def modify_widgets(self):
+        self.btn_ok.setStyleSheet("background-color: blue; color:white; border-radius: 3%")
+        self.btn_undo.setStyleSheet("border-radius: 3%")
+
+        self.btn_ok.setFlat(True)
+        self.btn_undo.setFlat(True)
+    
+
+    def get(self):
+        result = self.exec()
+        value = self.edit.text()
+        return [value, result]
+
+
+"""
+class InputText(QInputDialog):
+    def __init__(self, ok_text = "Créer", undo_text = "Annuler"):
+        super().__init__()
+        self.setInputMode(QInputDialog.TextInput)
+        self.setup_ui(ok_text, undo_text)
+    
+    def setup_ui(self, ok_text, undo_text):
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setOkButtonText(ok_text)
+        self.setCancelButtonText(undo_text)
+        self.setStyleSheet("height: 60px; width: 180px; background-color: white; font-size:18px; QPushButton{background-color: blue;}")
+        self.setLabelText("Entrez le nom de la tâche")
+        self.
+
+
+    def get(self):
+        result = self.exec()
+        value = self.textValue()
+        return [value, result]
+
+""" 
