@@ -1,23 +1,27 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QCoreApplication, QModelIndex, QSettings, Qt
-from PyQt5.QtGui import QIcon, QKeySequence
+from PyQt5.QtGui import QIcon, QKeySequence, QMouseEvent
 import os
 
 from .ui import *
-from .api.tasks import Task, change_folder_name, delete_all_tasks, delete_tasks, dump_tasks, init_task_file, load_tasks
+from .api.tasks import *
 
 class MainWindow(QWidget):
     def __init__(self, ctx):
         super().__init__()
         self.ctx = ctx
         self.setWindowTitle("Tableau de bord")
-        init_task_file()
-        self.tasks = load_tasks()
+        self.setup_data()
         self.setup_ui()
         self.add_to_startup()
         
     
+    def setup_data(self):
+        init_files()
+        self.tasks = load_tasks()
+        self.config = load_config() 
+
     #ui functions
     def setup_ui(self):
         self.create_widgets()
@@ -101,10 +105,8 @@ class MainWindow(QWidget):
             self.tabWidget.currentWidget().addTask(self.tasks[folder][name])
     
     def load_tasks(self):
-        self.tasks = load_tasks()
         for i in range(self.tabWidget.count()):
-            folder = self.tabWidget.widget(i).folder
-            self.tabWidget.widget(i).update_data(self.tasks[folder])
+            self.tabWidget.widget(i).update_data()
 
     def clean_done_tasks(self):
         self.tabWidget.currentWidget().clean_done_tasks()
@@ -127,10 +129,10 @@ class MainWindow(QWidget):
             self.tabWidget.addTab(TabView(name, {}), name)
             self.tasks[name] = {}
             self.dump()
-            
+
     def folder_double_clicked(self):
         current = self.tabWidget.currentWidget()
-        new_name, result = InputText("Entrez le nouveau nom du dossier :", "Confirmer").get()
+        new_name, result = InputText("Entrez le nouveau nom du dossier :", "Confirmer").get(current.folder)
         if new_name and result:
             change_folder_name(current.folder, new_name)
             current.folder = new_name
@@ -149,8 +151,11 @@ class MainWindow(QWidget):
             app_path = app_path.replace("/", "\\")
             setting.setValue("PyTasks", app_path)
     def exit(self):
-        self.hide()
-        self.clean_done_tasks()
-        self.close()
+        try:
+            self.hide()
+            if self.config["auto_clean"]: self.clean_done_tasks()
+        finally:
+            self.close()
+        
 
         
